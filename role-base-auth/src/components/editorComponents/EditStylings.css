@@ -1,0 +1,59 @@
+.maintablediv {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.test {
+    border: 2px solid white;
+    min-width: 50%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+table {
+    border: 2px solid whitesmoke;
+    border-left: none;
+    min-width: 100%;
+    height: 200px;
+}
+ 
+th {
+    border-left: 2px solid whitesmoke;
+}
+ 
+td {
+    border: 2px solid whitesmoke;
+    border-right: none;
+    border-bottom: none;
+    text-align: center;
+}
+
+.addPermission {
+    color: rgb(180, 237, 180);
+    /* border: 1px solid white; */
+    cursor: pointer;
+    font-size: xx-large;
+}
+
+.removePermission {
+    color: red;
+    cursor: pointer;
+    font-size: xx-large;
+}
+
+.editPermissionsdiv {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid grey;
+    width: 90%;
+    align-items: center;
+    justify-content: space-around;
+    margin-bottom: 2rem;
+}
+
+.editPermissionsdiv span {
+    text-align: center;
+}

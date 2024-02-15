@@ -1,0 +1,29 @@
+/* Style for the popup container */
+.popup {
+  position: fixed;
+  overflow-y: auto;
+  border: 2px solid white;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 90vw; /* Adjust maximum width as needed */
+  max-height: 90vh; /* Adjust maximum height as needed */
+  min-width: 40vw;
+  min-height: 80vh;
+  background-color: dodgerblue;
+  padding: 20px;
+}
+
+/* Style for the content inside the popup */
+.popup-inner {
+  /* If you want to center the content both horizontally and vertically */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  /* Additional styling for the content */
+  background-color: dodgerblue;
+  padding: 10px;
+  border-radius: 5px;
+}

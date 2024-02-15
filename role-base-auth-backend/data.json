@@ -1,0 +1,50 @@
+[
+    {
+        "id": 0,
+        "username": "Sajeel",
+        "password": "abc123",
+        "permissions": {
+            "USERFORM": true,
+            "LOGIN": true,
+            "EDITOR": true,
+            "VIEWER": true,
+            "DELETOR": true
+        }
+    },
+    {
+        "id": 1,
+        "username": "Hello",
+        "password": "abc123",
+        "permissions": {
+            "USERFORM": false,
+            "LOGIN": true,
+            "EDITOR": false,
+            "VIEWER": false,
+            "DELETOR": false
+        }
+    },
+    {
+        "id": 2,
+        "username": "Zafar",
+        "password": "123abc",
+        "permissions": {
+            "USERFORM": false,
+            "LOGIN": true,
+            "EDITOR": false,
+            "VIEWER": true,
+            "DELETOR": true
+        }
+    },
+    {
+        "id": 3,
+        "username": "New",
+        "password": "123abc",
+        "permissions": {
+            "USERFORM": false,
+            "LOGIN": true,
+            "EDITOR": true,
+            "VIEWER": true,
+            "DELETOR": true
+        }
+    }
+]
