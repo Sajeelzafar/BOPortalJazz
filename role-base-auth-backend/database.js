@@ -16,32 +16,52 @@ const pool = mysql
   .promise();
 
 async function getAllUsers() {
-  const [rows] = await pool.query(`
-    SELECT users.*, roles.role, roles.permissions
-    FROM users
-    JOIN roles ON users.role_id = roles.id;
-    `);
-  return rows;
+  try {
+    const [rows] = await pool.query(`
+      SELECT users.*, roles.role, roles.permissions
+      FROM users
+      JOIN roles ON users.role_id = roles.id;
+      `);
+    return rows;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
 }
 
 async function getDependentUsersList(id) {
-  const [rows] = await pool.query(
-    `
-    SELECT * FROM users where role_id = ?
-  `,
-    [id]
-  );
-  return rows;
+  try {
+    const [rows] = await pool.query(
+      `
+      SELECT * FROM users where role_id = ?
+    `,
+      [id]
+    );
+    return rows;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
 }
 
 async function getAllRoles() {
-  const [rows] = await pool.query("select * from roles");
-  return rows;
+  try {
+    const [rows] = await pool.query("select * from roles");
+    return rows;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
 }
 
 async function getAllPartners() {
-  const [rows] = await pool.query("select * from partner_detail");
-  return rows;
+  try {
+    const [rows] = await pool.query("select * from partner_detail");
+    return rows;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
 }
 
 async function getPartner(id) {
@@ -51,45 +71,61 @@ async function getPartner(id) {
     ]);
     return rows[0];
   } catch (error) {
+    console.log(error);
     return error;
   }
 }
 
 async function getUser(username) {
-  const [rows] = await pool.query(
-    `
-    SELECT * 
-    FROM users
-    WHERE username = ?
-    `,
-    [username]
-  );
-  return rows[0];
+  try {
+    const [rows] = await pool.query(
+      `
+      SELECT * 
+      FROM users
+      WHERE username = ?
+      `,
+      [username]
+    );
+    return rows[0];
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
 }
 
 async function getRole(role) {
-  const [rows] = await pool.query(
-    `
-      SELECT * 
-      FROM roles
-      WHERE role = ?
-      `,
-    [role]
-  );
-  return rows[0];
+  try {
+    const [rows] = await pool.query(
+      `
+        SELECT * 
+        FROM roles
+        WHERE role = ?
+        `,
+      [role]
+    );
+    return rows[0];
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
 }
 
 async function getUserRole(username) {
-  const [rows] = await pool.query(
-    `
-      SELECT users.*, roles.role, roles.role_datetime, roles.createdby, roles.permissions
-      FROM users
-      INNER JOIN roles ON users.role_id = roles.id
-      WHERE users.username = ?;
-    `,
-    [username]
-  );
-  return rows[0];
+  try {
+    const [rows] = await pool.query(
+      `
+        SELECT users.*, roles.role, roles.role_datetime, roles.createdby, roles.permissions
+        FROM users
+        INNER JOIN roles ON users.role_id = roles.id
+        WHERE users.username = ?;
+      `,
+      [username]
+    );
+    return rows[0];
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
 }
 
 async function createUser(username, password, email, phoneNumber) {
@@ -111,6 +147,7 @@ async function createUser(username, password, email, phoneNumber) {
     return result;
   } catch (error) {
     console.log("Error creating user:", error);
+    return error;
   }
 }
 
@@ -132,6 +169,7 @@ async function createRole(role, createdBy, permissions) {
     return result;
   } catch (error) {
     console.log("Error creating user:", error);
+    return error;
   }
 }
 
@@ -189,9 +227,10 @@ async function editUsername(prevName, newName) {
       WHERE username = ?
       `,
       [newName, prevName]
-    )
+    );
   } catch (error) {
-    
+    console.log(error);
+    return error;
   }
 }
 
@@ -208,6 +247,7 @@ async function editRolename(rolename, id) {
     return role;
   } catch (error) {
     console.log(error);
+    return error;
   }
 }
 
@@ -241,6 +281,7 @@ async function createOTP(otp_details) {
     return result;
   } catch (error) {
     console.log("Error creating user:", error);
+    return error;
   }
 }
 
@@ -257,6 +298,7 @@ async function getOTP(otp_id) {
     return rows[0];
   } catch (error) {
     console.log("Error finding OTP:", error);
+    return error;
   }
 }
 
@@ -307,34 +349,41 @@ async function verifyUser(id) {
     return result;
   } catch (error) {
     console.log(error);
+    return error;
   }
 }
 
 async function createPartner({
   companyCode,
   companyName,
-  partialPayment,
-  minimumAmount,
-  maximumAmount,
-  poolAccount,
-  notificationTemplate,
-  companyType,
+  companyTopic,
+  endpointURLInquiry,
+  endpointURLPaybill,
+  serviceContextInquiry,
+  serviceContextPaybill,
+  username,
+  password,
+  MI_SVC,
+  serviceName,
 }) {
   try {
     const [result] = await pool.query(
       `
-          INSERT INTO partner_detail (company_code, company_name, partial_payment, min_amount, max_amount, pool_account, notification_template, company_type)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO partner_detail (Company_Code, Company_Name, Company_Topic, Endpoint_URL_Inquiry, Endpoint_URL_Paybill, Service_Context_Inquiry, Service_Context_paybill, Username, Password, MI_SVC, Service_Name)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           `,
       [
         companyCode,
         companyName,
-        partialPayment,
-        minimumAmount,
-        maximumAmount,
-        poolAccount,
-        notificationTemplate,
-        companyType,
+        companyTopic,
+        endpointURLInquiry,
+        endpointURLPaybill,
+        serviceContextInquiry,
+        serviceContextPaybill,
+        username,
+        password,
+        MI_SVC,
+        serviceName,
       ]
     );
     return result;
@@ -352,6 +401,7 @@ async function offlinePartners() {
     return result;
   } catch (error) {
     console.log(error);
+    return error;
   }
 }
 
@@ -364,18 +414,17 @@ async function deletePartner({ id, company_code, company_name }) {
     return result;
   } catch (error) {
     console.log(error);
+    return error;
   }
 }
 
 async function deleteUser(id) {
   try {
-    const [result] = await pool.query(
-      " DELETE FROM users WHERE id = ? ",
-      [id]
-    );
+    const [result] = await pool.query(" DELETE FROM users WHERE id = ? ", [id]);
     return result;
   } catch (error) {
     console.log(error);
+    return error;
   }
 }
 

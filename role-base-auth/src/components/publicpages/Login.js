@@ -63,7 +63,8 @@ const Login = () => {
       } catch (error) {
         console.log("Login success audit log error:", error);
       }
-      setResponseData(response?.data);
+      console.log(response?.data);
+      setResponseData(response?.data?.user);
       setSuccess(true);
     } catch (err) {
       if (!err?.response) {

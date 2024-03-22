@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "../api/axios";
 import { ToastContainer, toast } from "react-toastify";
+import { v4 as uuidv4 } from "uuid";
 import {
   Badge,
   Button,
@@ -14,13 +15,17 @@ import {
   Form,
   OverlayTrigger,
   Tooltip,
+  Modal,
 } from "react-bootstrap";
+import Popup from "../components/Popup";
 const GETALLROLES = "/api/roles";
 
 const ExistingRole = ({ updateUserDatabase, user }) => {
   const [roles, setRoles] = useState([]);
   const [roleValue, setRoleValue] = useState(null);
   const [roleAssign, setRoleAssign] = useState(false);
+  const [ permissionWindow, setPermissionWindow ] = useState(false);
+  const [roleSelected, setRoleSelected] = useState({});
 
   const handleSubmitUser = (e) => {
     setRoleAssign(true);
@@ -48,6 +53,11 @@ const ExistingRole = ({ updateUserDatabase, user }) => {
       });
   }, []);
 
+  const handlePermissionClick = (roleDetails) => {
+    setRoleSelected(roleDetails);
+    setPermissionWindow(true);
+  }
+
   return (
     <>
       <p
@@ -68,7 +78,7 @@ const ExistingRole = ({ updateUserDatabase, user }) => {
                 <tbody>
                   {roles?.map((role) => {
                     return (
-                      <tr>
+                      <tr key={uuidv4()}>
                         <td>
                           <Form.Check className="mb-1 pl-0">
                             <Form.Check.Label>
@@ -88,7 +98,7 @@ const ExistingRole = ({ updateUserDatabase, user }) => {
                         </td>
                         <td>{role.role}</td>
                         <td>
-                          <Button type="button" variant="primary">
+                          <Button type="button" variant="primary" onClick={() => handlePermissionClick({ role: role.role, permissions: role.permissions })}>
                             View Permissions
                           </Button>
                         </td>
@@ -117,6 +127,21 @@ const ExistingRole = ({ updateUserDatabase, user }) => {
         </Card>
       </Col>
       <ToastContainer />
+      <Popup show={permissionWindow} onHide={() => setPermissionWindow(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title id="contained-modal-title-vcenter">
+            {roleSelected?.role}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {roleSelected?.permissions?.map((permission) => (
+            <p key={uuidv4()}>{permission}</p>
+          ))}
+          <span>
+            Click outside the inner box to navigate back to the roles page
+          </span>
+        </Modal.Body>
+      </Popup>
     </>
   );
 };

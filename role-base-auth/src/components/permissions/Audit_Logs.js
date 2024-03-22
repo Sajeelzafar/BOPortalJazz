@@ -21,9 +21,16 @@ const Audit_Logs = () => {
   const [auditlogs, setAuditLogs] = useState([]);
   useEffect(() => {
     axios
-      .get(AUDIT_LOGS)
+      .get(AUDIT_LOGS, {
+        params: {
+          sort: 'timestamp',
+          order: 'desc'
+        }
+      })
       .then((response) => {
-        setAuditLogs(response.data.auditlogs);
+        const auditlogsResponse = response.data.auditlogs;
+        const descResponse = auditlogsResponse.sort((a, b) => a - b).reverse();
+        setAuditLogs(descResponse);
       })
       .catch((error) => {
         console.error("Error:", error);

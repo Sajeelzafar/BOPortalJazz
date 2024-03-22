@@ -8,6 +8,8 @@ import Username from "../formComponents/Username";
 import RoleChoice from "../formComponents/RoleChoice";
 import Popup from "./Popup";
 import { Button } from "react-bootstrap";
+
+const AUDIT_LOGS = "/api/auditlogs";
 const UPDATE_URL = "/api/update";
 const NEWROLE_URL = "./api/newrole";
 
@@ -22,11 +24,36 @@ const Role_Assignment = ({ allPermissions }) => {
   const [roleAssign, setRoleAssign] = useState(false);
 
   async function updateUserDatabase(userData) {
-    const user_updateresponse = await axios.post(
-      UPDATE_URL,
-      JSON.stringify(userData)
-    );
-    setTargetUser(user_updateresponse.data);
+    try {
+      const user_updateresponse = await axios.post(
+        UPDATE_URL,
+        JSON.stringify(userData)
+      );
+      setTargetUser(user_updateresponse.data);
+      try {
+        await axios.post(
+          AUDIT_LOGS,
+          JSON.stringify({
+            username: auth?.user,
+            action: "Rolename",
+            success: true,
+            message_context: "dataAssign",
+          })
+        );
+      } catch (error) {
+        console.log("Update role audit log error:", error);
+      }
+    } catch (error) {
+      await axios.post(
+        AUDIT_LOGS,
+        JSON.stringify({
+          username: auth?.user,
+          action: "Rolename",
+          success: false,
+          message_context: "dataAssign",
+        })
+      );
+    }
   }
 
   async function updateRoleDatabase() {
@@ -51,8 +78,34 @@ const Role_Assignment = ({ allPermissions }) => {
           console.log(e);
         }
       }
+      try {
+        await axios.post(
+          AUDIT_LOGS,
+          JSON.stringify({
+            username: auth?.user,
+            action: "Rolename",
+            success: true,
+            message_context: "roleCreated",
+          })
+        );
+      } catch (error) {
+        console.log("New role audit log error:", error);
+      }
     } catch (err) {
       console.log(err);
+      try {
+        await axios.post(
+          AUDIT_LOGS,
+          JSON.stringify({
+            username: auth?.user,
+            action: "Rolename",
+            success: false,
+            message_context: "roleCreated",
+          })
+        );
+      } catch (error) {
+        console.log("New role audit log error:", error);
+      }
     }
   }
 

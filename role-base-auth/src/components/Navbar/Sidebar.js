@@ -109,13 +109,13 @@ function Sidebar() {
           </Accordion>
           {auth?.permissions?.map((permission) => {
             if (permission === "BILL_PROCESSING") {
-              return <></>;
+              return <React.Fragment key={uuidv4()}></React.Fragment>;
             } else if (
               permission === "PARTNER_MANAGE" ||
               permission === "PERMISSION_MANAGE" ||
               permission === "USER_MANAGEMENT"
             ) {
-              return <></>;
+              return <React.Fragment key={uuidv4()}></React.Fragment>;
             } else {
               return (
                 <li

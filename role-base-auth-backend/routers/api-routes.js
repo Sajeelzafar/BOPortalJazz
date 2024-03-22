@@ -1,5 +1,8 @@
 const express = require("express");
 const multer = require("multer");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const asyncHandler = require("express-async-handler");
 const {
   getUser,
   createUser,
@@ -30,6 +33,7 @@ const {
   editPermissions,
 } = require("../database");
 const otp_service = require("./otp_service");
+const verifyJWT = require("../middleware/verifyJWT");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
@@ -64,15 +68,6 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.post("/user", async (req, res) => {
-  // Check if the username already exists in the database
-  const existingUser = await getUserRole(req.body.username);
-  if (existingUser) {
-    return res.status(201).json(existingUser);
-  }
-  return res.status(404).json({ msg: "User not found" });
-});
-
 router.post("/auth", async (req, res) => {
   // Check if the username exists in the database
   const user = await getUserRole(req.body.user);
@@ -82,13 +77,52 @@ router.post("/auth", async (req, res) => {
 
   if (user) {
     if (user.password === req.body.pwd) {
-      return res.status(200).json(user);
+      //New Code
+      const accessToken = jwt.sign(
+        {
+          UserInfo: {
+            username: user.username,
+            role: user.role,
+          },
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: "1m" }
+      );
+
+      const refreshToken = jwt.sign(
+        { username: user.username },
+        process.env.REFRESH_TOKEN_SECRET,
+        { expiresIn: "7d" }
+      );
+
+      // Create secure cookie with refresh token
+      res.cookie("jwt", refreshToken, {
+        httpOnly: true, //accessible only by web server
+        sameSite: "None",
+        maxAge: 7 * 24 * 60 * 60 * 1000, //cookie expiry: set to match rT
+      });
+
+      // Send accessToken containing username and roles
+      //New Code
+      return res.status(200).json({ accessToken, user });
     }
     return res.status(401).json({ msg: "Unauthorized" });
   }
 
   res.status(401).json({ msg: "Unauthorized" });
 });
+
+// router.use(verifyJWT);
+
+router.post("/user", async (req, res) => {
+  // Check if the username already exists in the database
+  const existingUser = await getUserRole(req.body.username);
+  if (existingUser) {
+    return res.status(201).json(existingUser);
+  }
+  return res.status(404).json({ msg: "User not found" });
+});
+
 
 router.post("/newrole", async (req, res) => {
   try {
@@ -198,8 +232,11 @@ router.post("/editrolepermissions", async (req, res) => {
       try {
         const permissionsUpdate = await editPermissions(id, permissions);
         return res
-        .status(200)
-        .json({ ...permissionsUpdate, msg: "Permissions changed successfully" });
+          .status(200)
+          .json({
+            ...permissionsUpdate,
+            msg: "Permissions changed successfully",
+          });
       } catch (error) {
         return res.json({
           status: 409,
@@ -218,7 +255,11 @@ router.post("/editrolepermissions", async (req, res) => {
       const editRole = await editRolename(rolename, id);
       return res
         .status(201)
-        .json({ ...editRole, status: 200, msg: "Role name changed successfully" });
+        .json({
+          ...editRole,
+          status: 200,
+          msg: "Role name changed successfully",
+        });
     }
   } catch (e) {
     return res.status(500).json({ msg: "Internal Server Error" });

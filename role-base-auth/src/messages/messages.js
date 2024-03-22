@@ -1,5 +1,6 @@
 export const successMessages = {
   userCreated: "User created successfully",
+  roleCreated: "Role created successfully",
   OTPlogin: "OTP generated successfully",
   OTPverified: "OTP verified successfully",
   userSignIn: "Successfully signed in", //Attempt was made by XYZ at ABC time
@@ -8,12 +9,13 @@ export const successMessages = {
   dataUpdated: "Data updated successfully", //{Action} data updated sucessfully
   dataAdd: "Data added successfully",
   dataDelete: "Data deleted successfully",
-  dataAssign: "Role assigned successfully",
+  dataAssign: "Assigned successfully",
   logOut: "logged out",
 };
 
 export const failureMessages = {
   userCreated: "Failed to create user",
+  roleCreated: "Failed to create role",
   OTPlogin: "Failed to generate OTP",
   OTPverified: "OTP verification failed",
   userSignIn: "Failed to sign in",
@@ -22,6 +24,6 @@ export const failureMessages = {
   dataUpdated: "Data failed to be updated",
   dataAdd: "Data failed to be added",
   dataDelete: "Data failed to be deleted",
-  dataAssign: "Role failed to be assigned",
+  dataAssign: "Failed to be assigned",
   logOut: "Failed to log out",
 };
