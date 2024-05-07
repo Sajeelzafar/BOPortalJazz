@@ -1,7 +1,11 @@
 const express = require("express");
 const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
 const bcrypt = require("bcrypt");
+const { exec } = require("child_process");
 const jwt = require("jsonwebtoken");
+const { shell } = require("electron");
 const asyncHandler = require("express-async-handler");
 const {
   getUser,
@@ -24,6 +28,7 @@ const {
   deletePartner,
   updatePartner,
   getauditlogs,
+  getfilelogs,
   fileDetailsAdd,
   getDependentUsersList,
   getPartner,
@@ -36,6 +41,7 @@ const otp_service = require("./otp_service");
 const verifyJWT = require("../middleware/verifyJWT");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+const uploadFile = multer({ dest: "uploads/" });
 
 const router = express.Router();
 
@@ -122,7 +128,6 @@ router.post("/user", async (req, res) => {
   }
   return res.status(404).json({ msg: "User not found" });
 });
-
 
 router.post("/newrole", async (req, res) => {
   try {
@@ -231,12 +236,10 @@ router.post("/editrolepermissions", async (req, res) => {
     if (permissions) {
       try {
         const permissionsUpdate = await editPermissions(id, permissions);
-        return res
-          .status(200)
-          .json({
-            ...permissionsUpdate,
-            msg: "Permissions changed successfully",
-          });
+        return res.status(200).json({
+          ...permissionsUpdate,
+          msg: "Permissions changed successfully",
+        });
       } catch (error) {
         return res.json({
           status: 409,
@@ -253,23 +256,22 @@ router.post("/editrolepermissions", async (req, res) => {
       });
     } else {
       const editRole = await editRolename(rolename, id);
-      return res
-        .status(201)
-        .json({
-          ...editRole,
-          status: 200,
-          msg: "Role name changed successfully",
-        });
+      return res.status(201).json({
+        ...editRole,
+        status: 200,
+        msg: "Role name changed successfully",
+      });
     }
   } catch (e) {
     return res.status(500).json({ msg: "Internal Server Error" });
   }
 });
 
-router.get("/otpgenerate", async (req, res) => {
+router.post("/otpgenerate", async (req, res) => {
   try {
     const otp_details = await otp_service.generateOTP();
     const otp_entry = await createOTP(otp_details);
+    otp_service.sendOTP(otp_details, req.body);
     return res.json({
       status: 201,
       msg: "OTP generated successfully",
@@ -301,7 +303,7 @@ router.post("/billsUpload", upload.single("file"), async (req, res) => {
   try {
     const { buffer } = req.file;
     const company_detail = await getPartner(req.body.companyId);
-    const { company_code, company_name } = company_detail;
+    const { Company_Code, Company_Name } = company_detail;
 
     // Convert buffer to string (assuming it's a text/csv file)
     const fileContent = buffer.toString("utf-8");
@@ -324,7 +326,7 @@ router.post("/billsUpload", upload.single("file"), async (req, res) => {
       try {
         const prevEntries = await previousBillEntries(values);
         if (prevEntries.length === 0) {
-          values = values.concat(company_code, company_name);
+          values = values.concat(Company_Code, Company_Name);
           try {
             const insertion = await billProcessing(columns, values);
 
@@ -398,11 +400,21 @@ router.get("/offlinePartners", async (req, res) => {
   }
 });
 
-router.post("/fileDetailsAdd", async (req, res) => {
+router.post("/fileDetailsAdd", uploadFile.single("file"), async (req, res) => {
   try {
-    const fileDetails = await fileDetailsAdd(req.body);
+    const fileData = JSON.parse(req.body.fileData);
+    const fileName = req.file.filename;
+    const timestampFile = Date.now();
+    const newDirectory = `uploads/${timestampFile}`;
+    const newPath = `${newDirectory}/${fileData.name}`;
+    if (!fs.existsSync(newDirectory)) {
+      fs.mkdirSync(newDirectory, { recursive: true });
+    }
+    fs.renameSync(req.file.path, newPath);
+    const fileDetails = await fileDetailsAdd(fileData, newPath);
     return res.json(fileDetails);
   } catch (error) {
+    console.log(error);
     return res.json({ msg: "Internal Server Error" });
   }
 });
@@ -434,6 +446,34 @@ router.get("/auditlogs", async (req, res) => {
     console.log(error);
     return res.json({ msg: "Internal Server Error" });
   }
+});
+
+router.get("/filelogs", async (req, res) => {
+  try {
+    const filelogs = await getfilelogs(req.body);
+    return res.json({ filelogs });
+  } catch (error) {
+    console.log(error);
+    return res.json({ msg: "Internal Server Error" });
+  }
+});
+
+const ROOT_DIR = path.join(__dirname, "../");
+
+router.get("/download/uploads/:filePathFolder/:filePathURL", (req, res) => {
+  const { filePathFolder, filePathURL } = req.params;
+  const folder = path.win32.join(ROOT_DIR, "/uploads", filePathFolder);
+  fs.access(folder, fs.constants.F_OK, (err) => {
+    if (err) {
+      return res.json({ msg: "Folder not found" });
+    }
+    exec(`start "" "${folder}"`, (error) => {
+      if (error) {
+        return res.json({ msg: "Error opening folder" });
+      }
+      return res.json({ msg: "Folder Opened Successfully" });
+    });
+  });
 });
 
 module.exports = router;

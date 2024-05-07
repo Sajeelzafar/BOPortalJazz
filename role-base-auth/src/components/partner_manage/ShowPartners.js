@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { Button, Dropdown, Form, Modal, Table } from "react-bootstrap";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import Popup from "../Popup";
 import axios from "../../api/axios";
 
@@ -13,7 +13,7 @@ const ShowPartners = ({ handlePartnerWindow, partners }) => {
 
   const DELETE_PARTNER = "/api/partnerdelete";
   const UPDATE_PARTNER = "/api/partnerupdate";
-  
+
   const handleDropdownChange = (event, roleId) => {
     const { value } = event.target;
     setSelectedOptions((prevSelectedOptions) => ({
@@ -27,7 +27,7 @@ const ShowPartners = ({ handlePartnerWindow, partners }) => {
       ...prevEditableRows,
       [id]: {
         ...prevEditableRows[id],
-        "company_type": selectedCompanyType,
+        Service_Name: selectedCompanyType,
       },
     }));
   };
@@ -38,7 +38,11 @@ const ShowPartners = ({ handlePartnerWindow, partners }) => {
         DELETE_PARTNER,
         JSON.stringify({ selectedPartner })
       );
-      handlePartnerWindow(deleteResponse.data.status, deleteResponse.data.msg, "dataDelete");
+      handlePartnerWindow(
+        deleteResponse.data.status,
+        deleteResponse.data.msg,
+        "dataDelete"
+      );
     }
     setDeleteWindow(false);
   };
@@ -55,12 +59,16 @@ const ShowPartners = ({ handlePartnerWindow, partners }) => {
   };
 
   const handleSaveChanges = async (e, id) => {
-    if(e.target.textContent === "Save Changes"){
+    if (e.target.textContent === "Save Changes") {
       const updateResponse = await axios.post(
         UPDATE_PARTNER,
         JSON.stringify({ updatePartnerData: editableRows[id] })
       );
-      handlePartnerWindow(updateResponse.data.status, updateResponse.data.msg, "dataUpdated");
+      handlePartnerWindow(
+        updateResponse.data.status,
+        updateResponse.data.msg,
+        "dataUpdated"
+      );
     }
     setEditableRows((prevEditableRows) => ({
       ...prevEditableRows,
@@ -95,12 +103,13 @@ const ShowPartners = ({ handlePartnerWindow, partners }) => {
           <tr>
             <th>Company Code</th>
             <th>Company Name</th>
-            <th>Partial Payment</th>
-            <th>Min Amount</th>
-            <th>Max Amount</th>
-            <th>Pool Account</th>
-            <th>Notification Template</th>
-            <th>Company Type</th>
+            <th>Company Topic</th>
+            <th>Endpoint URL Inquiry</th>
+            <th>Endpoint URL Paybill</th>
+            <th>MI SVC</th>
+            <th>Service Context Inquiry</th>
+            <th>Service Context Paybill</th>
+            <th>Service Name</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -109,13 +118,15 @@ const ShowPartners = ({ handlePartnerWindow, partners }) => {
             (
               {
                 id,
-                company_code,
-                company_name,
-                partial_payment,
-                min_amount,
-                max_amount,
-                pool_account,
-                notification_template,
+                Company_Code,
+                Company_Name,
+                Company_Topic,
+                Endpoint_URL_Inquiry,
+                Endpoint_URL_Paybill,
+                MI_SVC,
+                Service_Context_Inquiry,
+                Service_Context_paybill,
+                Service_Name,
                 company_type,
               },
               rowIndex
@@ -132,10 +143,10 @@ const ShowPartners = ({ handlePartnerWindow, partners }) => {
                           <input
                             type="text"
                             value={
-                              editableRows[id]?.company_code || company_code
+                              editableRows[id]?.Company_Code || Company_Code
                             }
                             onChange={(e) =>
-                              handleInputChange(e, "company_code", id)
+                              handleInputChange(e, "Company_Code", id)
                             }
                           />
                         </label>
@@ -146,100 +157,144 @@ const ShowPartners = ({ handlePartnerWindow, partners }) => {
                           <input
                             type="text"
                             value={
-                              editableRows[id]?.company_name || company_name
+                              editableRows[id]?.Company_Name || Company_Name
                             }
                             onChange={(e) =>
-                              handleInputChange(e, "company_name", id)
+                              handleInputChange(e, "Company_Name", id)
                             }
                           />
                         </label>
                       </td>
                       <td>
                         <label>
-                          Partial Payment
+                          Company Topic
                           <input
                             type="text"
                             value={
-                              editableRows[id]?.partial_payment ||
-                              partial_payment
+                              editableRows[id]?.Company_Topic || Company_Topic
                             }
                             onChange={(e) =>
-                              handleInputChange(e, "partial_payment", id)
+                              handleInputChange(e, "Company_Topic", id)
                             }
                           />
                         </label>
                       </td>
                       <td>
                         <label>
-                          Minimum Amount
-                          <input
-                            type="text"
-                            value={editableRows[id]?.min_amount || min_amount}
-                            onChange={(e) =>
-                              handleInputChange(e, "min_amount", id)
-                            }
-                          />
-                        </label>
-                      </td>
-                      <td>
-                        <label>
-                          Maximum Amount
-                          <input
-                            type="text"
-                            value={editableRows[id]?.max_amount || max_amount}
-                            onChange={(e) =>
-                              handleInputChange(e, "max_amount", id)
-                            }
-                          />
-                        </label>
-                      </td>
-                      <td>
-                        <label>
-                          Pool Account
+                          Endpoint URL Inquiry
                           <input
                             type="text"
                             value={
-                              editableRows[id]?.pool_account || pool_account
+                              editableRows[id]?.Endpoint_URL_Inquiry ||
+                              Endpoint_URL_Inquiry
                             }
                             onChange={(e) =>
-                              handleInputChange(e, "pool_account", id)
+                              handleInputChange(e, "Endpoint_URL_Inquiry", id)
                             }
                           />
                         </label>
                       </td>
                       <td>
                         <label>
-                          Notification Template
+                          Endpoint URL Paybill
                           <input
                             type="text"
                             value={
-                              editableRows[id]?.notification_template ||
-                              notification_template
+                              editableRows[id]?.Endpoint_URL_Paybill ||
+                              Endpoint_URL_Paybill
                             }
                             onChange={(e) =>
-                              handleInputChange(e, "notification_template", id)
+                              handleInputChange(e, "Endpoint_URL_Paybill", id)
                             }
                           />
                         </label>
                       </td>
                       <td>
-                        <Form.Group controlId="formCompanyType" onChange={(e) =>
-                              handleInputChange(e, "companyType", id)
-                            }>
-                          <Form.Label>Company Type</Form.Label>
-                          <Dropdown onSelect={(e) => handleCompanyTypeChange(e, id)}>
+                        <label>
+                          MI SVC
+                          <input
+                            type="text"
+                            value={editableRows[id]?.MI_SVC || MI_SVC}
+                            onChange={(e) => handleInputChange(e, "MI_SVC", id)}
+                          />
+                        </label>
+                      </td>
+                      <td>
+                        <label>
+                          Service Context Inquiry
+                          <input
+                            type="text"
+                            value={
+                              editableRows[id]?.Service_Context_Inquiry ||
+                              Service_Context_Inquiry
+                            }
+                            onChange={(e) =>
+                              handleInputChange(
+                                e,
+                                "Service_Context_Inquiry",
+                                id
+                              )
+                            }
+                          />
+                        </label>
+                      </td>
+                      <td>
+                        <label>
+                          Service Context Paybill
+                          <input
+                            type="text"
+                            value={
+                              editableRows[id]?.Service_Context_paybill ||
+                              Service_Context_paybill
+                            }
+                            onChange={(e) =>
+                              handleInputChange(
+                                e,
+                                "Service_Context_paybill",
+                                id
+                              )
+                            }
+                          />
+                        </label>
+                      </td>
+                      {/* <td>
+                        <label>
+                        Service Name
+                          <input
+                            type="text"
+                            value={
+                              editableRows[id]?.Service_Name ||
+                              Service_Name
+                            }
+                            onChange={(e) =>
+                              handleInputChange(e, "Service_Name", id)
+                            }
+                          />
+                        </label>
+                      </td> */}
+                      <td>
+                        <Form.Group
+                          controlId="formCompanyType"
+                          onChange={(e) =>
+                            handleInputChange(e, "companyType", id)
+                          }
+                        >
+                          <Form.Label>Service_Name</Form.Label>
+                          <Dropdown
+                            onSelect={(e) => handleCompanyTypeChange(e, id)}
+                          >
                             <Dropdown.Toggle
                               variant="primary"
                               id="dropdown-company-type"
                             >
-                              {editableRows[id]?.company_type || company_type}
+                              {editableRows[id]?.Service_Name || Service_Name}
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
                               <Dropdown.Item eventKey="Generic">
                                 Generic
                               </Dropdown.Item>
-                              <Dropdown.Item eventKey="NonGeneric">
-                                Non-Generic
+                              <Dropdown.Item eventKey="Non_Generic">
+                                Non Generic
                               </Dropdown.Item>
                               <Dropdown.Item eventKey="Offline">
                                 Offline
@@ -252,9 +307,7 @@ const ShowPartners = ({ handlePartnerWindow, partners }) => {
                         <Button
                           type="button"
                           size="sm"
-                          onClick={(e) =>
-                            handleSaveChanges(e, id)
-                          }
+                          onClick={(e) => handleSaveChanges(e, id)}
                         >
                           Save Changes
                         </Button>
@@ -264,9 +317,7 @@ const ShowPartners = ({ handlePartnerWindow, partners }) => {
                           type="button"
                           variant="danger"
                           size="sm"
-                          onClick={(e) =>
-                            handleSaveChanges(e, id)
-                          }
+                          onClick={(e) => handleSaveChanges(e, id)}
                         >
                           Cancel Changes
                         </Button>
@@ -274,14 +325,16 @@ const ShowPartners = ({ handlePartnerWindow, partners }) => {
                     </>
                   ) : (
                     <>
-                      <td>{company_code}</td>
-                      <td>{company_name}</td>
-                      <td>{partial_payment}</td>
-                      <td>{min_amount}</td>
-                      <td>{max_amount}</td>
-                      <td>{pool_account}</td>
-                      <td>{notification_template}</td>
-                      <td>{company_type}</td>
+                      <td>{Company_Code}</td>
+                      <td>{Company_Name}</td>
+                      <td>{Company_Topic}</td>
+                      <td>{Endpoint_URL_Inquiry}</td>
+                      <td>{Endpoint_URL_Paybill}</td>
+                      <td>{MI_SVC}</td>
+                      <td>{Service_Context_Inquiry}</td>
+                      <td>{Service_Context_paybill}</td>
+                      <td>{Service_Name}</td>
+                      {/* <td>{company_type}</td> */}
                       <td>
                         <div>
                           <label htmlFor={id}>
@@ -303,8 +356,8 @@ const ShowPartners = ({ handlePartnerWindow, partners }) => {
                             onClick={() =>
                               handleClickDropdownButton({
                                 id,
-                                company_code,
-                                company_name,
+                                Company_Code,
+                                Company_Name,
                               })
                             }
                           >
@@ -324,7 +377,9 @@ const ShowPartners = ({ handlePartnerWindow, partners }) => {
         <Modal.Header closeButton>
           <Modal.Title id="contained-modal-title-vcenter">
             Are you sure you want to delete{" "}
-            <strong>{selectedPartner?.company_code} - {selectedPartner?.company_name}</strong>
+            <strong>
+              {selectedPartner?.Company_Code} - {selectedPartner?.Company_Name}
+            </strong>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>

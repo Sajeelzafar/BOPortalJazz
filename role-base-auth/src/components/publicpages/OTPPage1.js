@@ -18,8 +18,17 @@ const OTPPage1 = ({ handleOTPSuccess, email, phoneNumber, user }) => {
   const handlesendOTPs = async () => {
     setSendOTPs(true);
     try {
-      const OTP_response = await axios.get(GET_OTP);
-      setOtpId(OTP_response.data.otp_id);
+      try {
+        const OTP_response = await axios.post(
+          GET_OTP,
+          JSON.stringify({
+            email,
+            phoneNumber: `0092${phoneNumber}`,
+          })
+        );
+        setOtpId(OTP_response.data.otp_id);
+      } catch (error) {}
+
       try {
         await axios.post(
           AUDIT_LOGS,
@@ -89,8 +98,7 @@ const OTPPage1 = ({ handleOTPSuccess, email, phoneNumber, user }) => {
           console.log("OTP verification success audit log error:", error);
         }
       }
-    }
-    else {
+    } else {
       try {
         await axios.post(
           AUDIT_LOGS,
@@ -214,7 +222,7 @@ const OTPPage1 = ({ handleOTPSuccess, email, phoneNumber, user }) => {
                           <Form.Control
                             type="text"
                             name="phoneNumber"
-                            value={phoneNumber}
+                            value={`0092${phoneNumber}`}
                             disabled
                           ></Form.Control>
                         </Form.Group>

@@ -1,5 +1,6 @@
 const mysql = require("mysql2");
 const dotenv = require("dotenv");
+const path = require("path");
 dotenv.config();
 
 const pool = mysql
@@ -325,9 +326,6 @@ async function previousBillEntries(values) {
       `SELECT * FROM bill_processing_import 
       WHERE CONSUMER_NO = ? AND NAME_OF_CONSUMER = ? AND BILLING_MONTH = ?
       AND AMOUNT_BEFORE_DUE_DATE = ? AND AMOUNT_AFTER_DUE_DATE = ? AND DUE_DATE = ?`,
-      // `SELECT CONSUMER_NO, NAME_OF_CONSUMER, BILLING_MONTH, AMOUNT_BEFORE_DUE_DATE,
-      //  AMOUNT_AFTER_DUE_DATE, DUE_DATE
-      //  FROM bill_processing_import WHERE CONSUMER_NO = ?`,
       [values[0], values[1], values[2], values[3], values[4], values[5]]
     );
     return result;
@@ -354,17 +352,17 @@ async function verifyUser(id) {
 }
 
 async function createPartner({
-  companyCode,
-  companyName,
-  companyTopic,
-  endpointURLInquiry,
-  endpointURLPaybill,
-  serviceContextInquiry,
-  serviceContextPaybill,
-  username,
-  password,
+  Company_Code,
+  Company_Name,
+  Company_Topic,
+  Endpoint_URL_Inquiry,
+  Endpoint_URL_Paybill,
+  Service_Context_Inquiry,
+  Service_Context_paybill,
+  Username,
+  Password,
   MI_SVC,
-  serviceName,
+  Service_Name,
 }) {
   try {
     const [result] = await pool.query(
@@ -373,17 +371,17 @@ async function createPartner({
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           `,
       [
-        companyCode,
-        companyName,
-        companyTopic,
-        endpointURLInquiry,
-        endpointURLPaybill,
-        serviceContextInquiry,
-        serviceContextPaybill,
-        username,
-        password,
+        Company_Code,
+        Company_Name,
+        Company_Topic,
+        Endpoint_URL_Inquiry,
+        Endpoint_URL_Paybill,
+        Service_Context_Inquiry,
+        Service_Context_paybill,
+        Username,
+        Password,
         MI_SVC,
-        serviceName,
+        Service_Name,
       ]
     );
     return result;
@@ -395,7 +393,7 @@ async function createPartner({
 async function offlinePartners() {
   try {
     const [result] = await pool.query(
-      `SELECT * FROM partner_detail WHERE company_type=?`,
+      `SELECT * FROM partner_detail WHERE Service_Name=?`,
       ["offline"]
     );
     return result;
@@ -405,11 +403,11 @@ async function offlinePartners() {
   }
 }
 
-async function deletePartner({ id, company_code, company_name }) {
+async function deletePartner({ id, Company_Code, Company_Name }) {
   try {
     const [result] = await pool.query(
-      "DELETE FROM partner_detail WHERE id=? AND company_code=? AND company_name=?",
-      [id, company_code, company_name]
+      "DELETE FROM partner_detail WHERE id=? AND Company_Code=? AND Company_Name=?",
+      [id, Company_Code, Company_Name]
     );
     return result;
   } catch (error) {
@@ -433,26 +431,28 @@ async function updatePartner(updatePartnerData) {
     const updateQuery = `
       UPDATE partner_detail
       SET 
-        company_code = ?,
-        company_name = ?,
-        partial_payment = ?,
-        min_amount = ?,
-        max_amount = ?,
-        pool_account = ?,
-        notification_template = ?,
-        company_type = ?
+        Company_Code = ?,
+        Company_Name = ?,
+        Company_Topic = ?,
+        Endpoint_URL_Inquiry = ?,
+        Endpoint_URL_Paybill = ?,
+        Service_Context_Inquiry = ?,
+        Service_Context_paybill = ?,
+        MI_SVC = ?,
+        Service_Name = ?
       WHERE id = ?;
     `;
 
     const values = [
-      updatePartnerData.company_code,
-      updatePartnerData.company_name,
-      updatePartnerData.partial_payment,
-      updatePartnerData.min_amount,
-      updatePartnerData.max_amount,
-      updatePartnerData.pool_account,
-      updatePartnerData.notification_template,
-      updatePartnerData.company_type,
+      updatePartnerData.Company_Code,
+      updatePartnerData.Company_Name,
+      updatePartnerData.Company_Topic,
+      updatePartnerData.Endpoint_URL_Inquiry,
+      updatePartnerData.Endpoint_URL_Paybill,
+      updatePartnerData.Service_Context_Inquiry,
+      updatePartnerData.Service_Context_paybill,
+      updatePartnerData.MI_SVC,
+      updatePartnerData.Service_Name,
       updatePartnerData.id,
     ];
 
@@ -464,13 +464,13 @@ async function updatePartner(updatePartnerData) {
   }
 }
 
-async function fileDetailsAdd(fileDetails) {
+async function fileDetailsAdd(fileDetails, newPath) {
   const currentdatetime = new Date();
   try {
     const [result] = await pool.query(
       `
-          INSERT INTO fileUploadDetail (name, type, size_bytes, user_id, user, upload_dateTime)
-          VALUES (?, ?, ?, ?, ?, ?)
+          INSERT INTO fileUploadDetail (name, type, size_bytes, user_id, user, upload_dateTime, path)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
           `,
       [
         fileDetails.name,
@@ -479,6 +479,7 @@ async function fileDetailsAdd(fileDetails) {
         fileDetails.id,
         fileDetails.user,
         currentdatetime.toISOString().slice(0, 19).replace("T", " "),
+        newPath,
       ]
     );
   } catch (error) {
@@ -512,6 +513,16 @@ async function getauditlogs() {
   }
 }
 
+async function getfilelogs() {
+  try {
+    const [result] = await pool.query(`SELECT * FROM fileuploaddetail`);
+    return result;
+  } catch (error) {
+    console.error(`Error getting file logs: ${error.message}`);
+    throw error;
+  }
+}
+
 module.exports = {
   createUser,
   getUser,
@@ -541,4 +552,5 @@ module.exports = {
   getPartner,
   auditlogsAdd,
   getauditlogs,
+  getfilelogs,
 };

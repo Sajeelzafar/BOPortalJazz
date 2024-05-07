@@ -91,6 +91,7 @@ const EditUser = () => {
         console.log("User audit log error:", error);
       }
     }
+    getAllUsers();
   }
 
   const handledeleteClick = async ({ target }) => {
@@ -142,12 +143,12 @@ const EditUser = () => {
         JSON.stringify(dataToSend)
       );
       auditLogUsers(response.data.status, response.data.msg, "dataUpdated");
-      if (response.status === 201) {
+      console.log("Response.status is:", response.status);
+      if (response.status === 200) {
         setUserSelected((userSelected) => ({
           ...userSelected,
           username: newUserName,
         }));
-        getAllUsers();
       }
     } catch (error) {
       console.log(error);

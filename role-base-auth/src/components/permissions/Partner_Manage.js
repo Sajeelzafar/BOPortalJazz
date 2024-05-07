@@ -58,7 +58,7 @@ const Partner_Manage = () => {
   };
 
   const handleSearchTypeChange = (event) => {
-    if (event.target.value === "company_type") {
+    if (event.target.value === "Service_Name") {
       setSearchTypeEnable(true);
     } else {
       setSearchValue(""); //Refreshes value after the type is changed
@@ -88,47 +88,68 @@ const Partner_Manage = () => {
         setPartners(filteredPartnersALL);
         break;
 
-      case "company_code":
+      case "Company_Code":
         const filteredPartnersCC = partners.filter((partner) => {
-          const companyCodeAsString = String(partner.company_code);
+          const companyCodeAsString = String(partner.Company_Code);
           return companyCodeAsString.includes(searchValue);
         });
         setPartners(filteredPartnersCC);
         break;
 
-      case "company_name":
+      case "Company_Name":
         const filteredPartnersCN = partners.filter((partner) =>
-          partner.company_name.includes(searchValue)
+          partner.Company_Name.includes(searchValue)
         );
         setPartners(filteredPartnersCN);
         break;
 
-      case "partial_payment":
-        const filteredPartnersPP = partners.filter(
-          (partner) => partner.partial_payment === Number(searchValue)
+      case "Company_Topic":
+        const filteredPartnersCT = partners.filter((partner) =>
+          partner.Company_Topic.includes(searchValue)
+        );
+        setPartners(filteredPartnersCT);
+        break;
+
+      case "Endpoint_URL_Inquiry":
+        const filteredPartnersPP = partners.filter((partner) =>
+          partner.Endpoint_URL_Inquiry.includes(searchValue)
         );
         setPartners(filteredPartnersPP);
         break;
 
-      case "min_amount":
-        const filteredPartnersMinA = partners.filter(
-          (partner) => partner.min_amount === Number(searchValue)
+      case "Endpoint_URL_Paybill":
+        const filteredPartnersMinA = partners.filter((partner) =>
+          partner.Endpoint_URL_Paybill.includes(searchValue)
         );
         setPartners(filteredPartnersMinA);
         break;
 
-      case "max_amount":
-        const filteredPartnersMaxA = partners.filter(
-          (partner) => partner.max_amount === Number(searchValue)
+      case "Service_Context_Inquiry":
+        const filteredPartnersMaxA = partners.filter((partner) =>
+          partner.Service_Context_Inquiry.includes(searchValue)
         );
         setPartners(filteredPartnersMaxA);
         break;
 
-      case "company_type":
-        const filteredPartnersCT = partners.filter((partner) =>
-          partner.company_type.includes(searchValue)
+      case "MI_SVC":
+        const filteredPartnersMI_SVC = partners.filter((partner) =>
+          partner.MI_SVC.includes(searchValue)
         );
-        setPartners(filteredPartnersCT);
+        setPartners(filteredPartnersMI_SVC);
+        break;
+
+      case "Service_Context_paybill":
+        const filteredPartnersSCP = partners.filter((partner) =>
+          partner.Service_Context_paybill.includes(searchValue)
+        );
+        setPartners(filteredPartnersSCP);
+        break;
+
+      case "Service_Name":
+        const filteredPartnersSN = partners.filter((partner) =>
+          partner.Service_Name.includes(searchValue)
+        );
+        setPartners(filteredPartnersSN);
         break;
 
       default:
@@ -176,16 +197,23 @@ const Partner_Manage = () => {
                   }}
                 >
                   <option value="ALL">ALL</option>
-                  <option value="company_code">Company Code</option>
-                  <option value="company_name">Company Name</option>
-                  <option value="partial_payment">Partial Payment</option>
-                  <option value="min_amount">Min Amount</option>
-                  <option value="max_amount">Max Amount</option>
-                  <option value="pool_account">Pool Account</option>
-                  <option value="notification_template">
-                    Notification Template
+                  <option value="Company_Code">Company Code</option>
+                  <option value="Company_Name">Company Name</option>
+                  <option value="Company_Topic">Company Topic</option>
+                  <option value="Endpoint_URL_Inquiry">
+                    Endpoint URL Inquiry
                   </option>
-                  <option value="company_type">Company Type</option>
+                  <option value="Endpoint_URL_Paybill">
+                    Endpoint URL Paybill
+                  </option>
+                  <option value="MI_SVC">MI SVC</option>
+                  <option value="Service_Context_Inquiry">
+                    Service Context Inquiry
+                  </option>
+                  <option value="Service_Context_paybill">
+                    Service Context Paybill
+                  </option>
+                  <option value="Service_Name">Company Type</option>
                 </select>
                 {searchTypeEnable ? (
                   <select
@@ -199,7 +227,7 @@ const Partner_Manage = () => {
                     }}
                   >
                     <option value="Generic">Generic</option>
-                    <option value="NonGeneric">NonGeneric</option>
+                    <option value="Non_Generic">NonGeneric</option>
                     <option value="Offline">Offline</option>
                   </select>
                 ) : (

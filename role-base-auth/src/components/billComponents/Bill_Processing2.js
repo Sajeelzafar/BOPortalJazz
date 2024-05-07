@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import {
   Button,
   Card,
@@ -67,7 +68,7 @@ const Bill_Processing2 = () => {
     }
   };
 
-  const storingFileDetails = async () => {
+  const storingFileDetails = async (formData) => {
     const fileData = {
       name: file?.name,
       type: file?.type,
@@ -75,8 +76,10 @@ const Bill_Processing2 = () => {
       id: auth?.id,
       user: auth?.user,
     };
+    formData.append('fileData', JSON.stringify(fileData));
     try {
-      await axios.post(FILE_DETAILS_ADD, fileData);
+      const response = await axios.post(FILE_DETAILS_ADD, formData);
+      console.log(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -124,7 +127,7 @@ const Bill_Processing2 = () => {
               } catch (error) {
                 console.log("Bill Upload success audit log error:", error);
               }
-              storingFileDetails();
+              await storingFileDetails(formData);
               setResponse(result.data);
               setDisableUpload(true);
               setStatus("success");
@@ -238,38 +241,39 @@ const Bill_Processing2 = () => {
               <Form.Group controlId="formCompanyType">
                 <Form.Label>Company Code - Company Type</Form.Label>
                 {editableCompanySelection ? (
-                  <>
+                  <React.Fragment key={uuidv4()}>
                     <Dropdown onSelect={handleCompanyCodeChange}>
                       <Dropdown.Toggle
                         variant="primary"
                         id="dropdown-company-type"
                       >
-                        {offlineCompanies[companyid]?.company_code} -{" "}
-                        {offlineCompanies[companyid]?.company_name}
+                        {offlineCompanies[companyid]?.Company_Code} -{" "}
+                        {offlineCompanies[companyid]?.Company_Name}
                       </Dropdown.Toggle>
                       <Dropdown.Menu>
-                        {offlineCompanies.map((offlineCompany, index) => (
-                          <Dropdown.Item
-                            key={offlineCompany?.company_code}
-                            eventKey={index}
-                          >
-                            {offlineCompany?.company_code} -{" "}
-                            {offlineCompany?.company_name}
-                          </Dropdown.Item>
-                        ))}
+                        {offlineCompanies.length > 0 &&
+                          offlineCompanies?.map((offlineCompany, index) => (
+                            <Dropdown.Item
+                              key={offlineCompany?.Company_Code}
+                              eventKey={index}
+                            >
+                              {offlineCompany?.Company_Code} -{" "}
+                              {offlineCompany?.Company_Name}
+                            </Dropdown.Item>
+                          ))}
                       </Dropdown.Menu>
                     </Dropdown>
                     <br />
                     <Button onClick={handleConfirmCompany}>
                       Click here to confirm
                     </Button>
-                  </>
+                  </React.Fragment>
                 ) : (
                   <>
                     <Form.Control
                       plaintext
                       readOnly
-                      value={`${offlineCompanies[companyid]?.company_code} - ${offlineCompanies[companyid]?.company_name}`}
+                      value={`${offlineCompanies[companyid]?.Company_Code} - ${offlineCompanies[companyid]?.Company_Name}`}
                     />
                     <hr />
                     <label htmlFor="file" className="sr-only">
